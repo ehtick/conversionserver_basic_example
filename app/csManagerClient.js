@@ -25,11 +25,10 @@ class CsManagerClient {
         var _this = this;
         this._updatedTime = undefined;
         this._modelHash = [];
-
-      
+     
         setInterval(async function () {
-            await _this._checkForNewModels();
-        }, 2000);
+            await _this.checkForNewModels();
+        }, 1000);
 
     }
 
@@ -41,7 +40,7 @@ class CsManagerClient {
         $("#filedroparea").css("display", "none");
     }
 
-    async _checkForNewModels() {
+    async checkForNewModels() {
         var _this = this;
 
         let res = await fetch(serveraddress + '/api/updated');
@@ -93,7 +92,7 @@ class CsManagerClient {
 
         var html = "";
         $("#" + targetdiv).empty();
-        html += '<button onclick=\'csManagerClient.showUploadWindow()\' class="bcfbutton bcfeditbutton"><i class="bx bx-upload"></i></button>';
+        html += '<button onclick=\'csManagerClient.showUploadWindow()\' class="userbutton usereditbutton"><i class="bx bx-upload"></i></button>';
         html += '<div style="top:40px;position:relative;">';
 
         for (var i in this._modelHash) {
