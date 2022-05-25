@@ -13,6 +13,9 @@ class CsManagerClient {
             myDropzone.removeFile(file);
         });
         myDropzone.on("sending", async function (file, response, request) {
+
+            let api_arg  = {startPath:$("#modelpath").val()};
+            response.setRequestHeader('CS-API-Arg', JSON.stringify(api_arg));
             console.log("reached");
         });    
       
@@ -23,7 +26,10 @@ class CsManagerClient {
         this._updatedTime = undefined;
         this._modelHash = [];
 
-        this.checkForNewModels();
+      
+        setInterval(async function () {
+            await _this._checkForNewModels();
+        }, 2000);
 
     }
 
@@ -35,12 +41,20 @@ class CsManagerClient {
         $("#filedroparea").css("display", "none");
     }
 
-    async checkForNewModels() {
+    async _checkForNewModels() {
         var _this = this;
 
-        var res = await fetch(serveraddress + '/api/items');
+        let res = await fetch(serveraddress + '/api/updated');
         var data = await res.json();
-        await this._updateModelList(data.modelarray);
+
+        var newtime = Date.parse(data.lastUpdated);
+        if (this._updatedTime == undefined || this._updatedTime != newtime)
+        {
+            let res = await fetch(serveraddress + '/api/items');
+            let data = await res.json();
+            this._updatedTime = newtime;
+            await this._updateModelList(data.modelarray);
+        }
     }
 
     async _updateModelList(data) {
@@ -48,7 +62,7 @@ class CsManagerClient {
         for (var i = 0; i < data.length; i++) {
             var part;
             var file = data[i].name.split(".")[0];
-            if (!data[i].pending) {
+            if (data[i].conversionState == "SUCCESS" ) {
 
                 let image = await fetch(serveraddress + '/api/file/' + data[i].storageID + "/" + "png");
 
@@ -63,7 +77,7 @@ class CsManagerClient {
 
             if (part) {
                 if (!this._modelHash[data[i].storageID]) {
-                    this._modelHash[data[i].storageID] = { nodeid: null, name: data[i].name, tree: null, image: part };
+                    this._modelHash[data[i].storageID] = { nodeid: null, name: data[i].name, tree: null, image: part, created: data[i].created };
                 }
                 this._modelHash[data[i].storageID].image = part;
             }
@@ -91,10 +105,14 @@ class CsManagerClient {
                 html += '<img src="' + this._modelHash[i].image + '" class="modelcard_image"></img>';
             html += '<div class="modelcard_info">';
             html += '<span class="modelcard_title">' + this._modelHash[i].name + '</span><br>';
+
+            if (this._modelHash[i].created)
+                html += '<span class="modelcard_size">Created:' + moment(this._modelHash[i].created).format("MM/DD/YYYY h:mm:ss a") + '</span>';
+            else
+                html += '<span class="modelcard_size">Created:n/a</span>';
             html += "</div>";
             html += '<label class="switch">';
-            if (this._modelHash[i].nodeid)
-            {
+            if (this._modelHash[i].nodeid) {
                 html += '<input type="checkbox" checked onclick=\'csManagerClient.addModel(this,"' + i + '")\'><span class="slider round"></span></label>';
             }
             else
