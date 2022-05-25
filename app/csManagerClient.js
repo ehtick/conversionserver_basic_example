@@ -1,11 +1,16 @@
-var csManagerClient = null;
 const serveraddress = "http://localhost:3001";
 
 class CsManagerClient {
 
-    static msready() {
+   
 
-        csManagerClient = new CsManagerClient();
+    constructor() {
+        this._updatedTime = undefined;
+        this._modelHash = [];
+     
+    }
+
+    initialize() {
         let myDropzone;
 
         myDropzone = new Dropzone("div#dropzonearea", { url: serveraddress + "/api/fileUpload", timeout: 180000 });
@@ -14,18 +19,12 @@ class CsManagerClient {
         });
         myDropzone.on("sending", async function (file, response, request) {
 
-            let api_arg  = {startPath:$("#modelpath").val()};
+            let api_arg = { startPath: $("#modelpath").val() };
             response.setRequestHeader('CS-API-Arg', JSON.stringify(api_arg));
             console.log("reached");
-        });    
-      
-    }
+        });
 
-    constructor() {
         var _this = this;
-        this._updatedTime = undefined;
-        this._modelHash = [];
-     
         setInterval(async function () {
             await _this.checkForNewModels();
         }, 1000);

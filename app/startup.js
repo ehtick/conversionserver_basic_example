@@ -1,3 +1,5 @@
+var csManagerClient = null;
+
 function msready() {
 
   // $("#content").css("top", "0px");
@@ -12,7 +14,10 @@ function msready() {
 
     hwv.view.setAmbientOcclusionEnabled(true);
 
-    CsManagerClient.msready();
+    csManagerClient = new CsManagerClient();
+    
+    csManagerClient.initialize();
+
 
   }, 10);
 }
@@ -21,21 +26,6 @@ function setupApp() {
 
   hwv.setCallbacks({
     modelStructureReady: msready,
-  });
-
-  var viewermenu = [   
-    {
-      name: 'Refresh',
-      fun: async function () {
-        csManagerClient.checkForNewModels();
-      }
-    },
-  ];
-
-  $('#viewermenu1button').contextMenu("menu", viewermenu, {
-    'displayAround': 'trigger',
-    verAdjust: 45,
-    horAdjust: -35
   });
 
   mainUI = new MainUI();
