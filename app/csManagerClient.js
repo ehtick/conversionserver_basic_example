@@ -1,4 +1,4 @@
-const serveraddress = "http://localhost:3001";
+const serveraddress = "http://44.204.12.208:11200";
 
 class CsManagerClient {
 
@@ -13,7 +13,7 @@ class CsManagerClient {
     initialize() {
         let myDropzone;
 
-        myDropzone = new Dropzone("div#dropzonearea", { url: serveraddress + "/api/fileUpload", timeout: 180000 });
+        myDropzone = new Dropzone("div#dropzonearea", { url: serveraddress + "/api/upload", timeout: 180000 });
         myDropzone.on("success", async function (file, response) {
             myDropzone.removeFile(file);
         });
