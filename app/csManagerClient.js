@@ -1,4 +1,4 @@
-const serveraddress = "http://44.204.12.208:11200";
+const serveraddress = "http://localhost:3001";
 
 class CsManagerClient {
 
@@ -51,7 +51,7 @@ class CsManagerClient {
             let res = await fetch(serveraddress + '/api/items');
             let data = await res.json();
             this._updatedTime = newtime;
-            await this._updateModelList(data.modelarray);
+            await this._updateModelList(data.itemarray);
         }
     }
 
