@@ -1,4 +1,4 @@
-const serveraddress = "http://localhost:3001";
+const serveraddress = "https://csapi.techsoft3d.com";
 
 class CsManagerClient {
 
@@ -108,6 +108,8 @@ class CsManagerClient {
                 html += '<span class="modelcard_size">Created:' + moment(this._modelHash[i].created).format("MM/DD/YYYY h:mm:ss a") + '</span>';
             else
                 html += '<span class="modelcard_size">Created:n/a</span>';
+            
+            html += '<br><span class="modelcard_size">ID:' + i + '</span>';                
             html += "</div>";
             html += '<label class="switch">';
             if (this._modelHash[i].nodeid) {
