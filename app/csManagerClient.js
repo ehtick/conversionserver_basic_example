@@ -76,6 +76,9 @@ class CsManagerClient {
                     let urlCreator = window.URL || window.webkitURL;
                     part = urlCreator.createObjectURL(imageblob);
                 }
+                else {
+                    part = "app/images/spinner.gif";
+                }                
             }
             else
                 part = "app/images/spinner.gif";
@@ -167,6 +170,10 @@ class CsManagerClient {
     async addModel(o, modelid) {
         if (o.checked) {
             if (this._modelHash[modelid].nodeid == null) {
+
+
+                // await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'CS-API-Arg': JSON.stringify({subDirectory:"moto_parts" }), 'items': JSON.stringify(["dd727009-1ce4-4713-b652-30be1cae0d3d"]) } });
+                // await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify(["7c9ccdcd-9fc0-4b74-8b39-d96c42202d3e"]) } });
                 await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify([modelid]) } });
               
                 var modelnode = hwv.model.createNode(modelid);
