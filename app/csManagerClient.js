@@ -1,4 +1,6 @@
-const serveraddress = "https://csapi.techsoft3d.com";
+//const serveraddress = "https://csapi.techsoft3d.com";
+const serveraddress = "http://localhost:3001";
+var globalSessionId;
 
 class CsManagerClient {
 
@@ -20,6 +22,11 @@ class CsManagerClient {
         myDropzone.on("sending", async function (file, response, request) {
 
             let api_arg = { startPath: $("#modelpath").val() };
+
+            if ($("#itemidspan").val() != "") {                
+                api_arg.itemid = $("#itemidspan").val();
+            }
+
             response.setRequestHeader('CS-API-Arg', JSON.stringify(api_arg));
             console.log("reached");
         });
@@ -160,11 +167,10 @@ class CsManagerClient {
     async addModel(o, modelid) {
         if (o.checked) {
             if (this._modelHash[modelid].nodeid == null) {
-                let res = await fetch(serveraddress + '/api/file/' +modelid + "/" + "scs");
-                var ab = await res.arrayBuffer();
-                var byteArray = new Uint8Array(ab);
+                await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify([modelid]) } });
+              
                 var modelnode = hwv.model.createNode(modelid);
-                var nodeids = await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
+                var nodeids = await hwv.model.loadSubtreeFromModel(modelnode, this._modelHash[modelid].name);
                 this._modelHash[modelid].nodeid = modelnode;
             }
 
@@ -181,6 +187,14 @@ class CsManagerClient {
         var ab = await res.arrayBuffer();
         var byteArray = new Uint8Array(ab);
         hwv.model.loadSubtreeFromScsBuffer(hwv.model.getRootNode(), byteArray);
+    }
+
+    async createEmpty() {
+
+        let res = await fetch(serveraddress + '/api/create', { method: 'put',headers: { 'CS-API-Arg': JSON.stringify({itemname:"EmptyContainer" }) } });
+        let resj = await res.json();
+        $("#itemidspan").val(resj.itemid);
+        
     }
 
 }

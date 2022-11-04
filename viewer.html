@@ -80,9 +80,22 @@
     var ui = null;
     var md = new MobileDetect(window.navigator.userAgent);
 
-    window.onload = function () {
-      Sample.createViewer().then(
-        function (viewer) {
+    window.onload = async function () {
+
+
+     let res = await fetch(serveraddress + '/api/streamingSession');
+     var data = await res.json();
+     globalSessionId = data.sessionid;
+
+     let viewer = new Communicator.WebViewer({
+      containerId: "viewerContainer",
+      endpointUri: 'ws://' + data.serverurl + ":" + data.port + '?token=' + data.sessionid,
+      model: "_empty",
+      enginePath: "https://cdn.jsdelivr.net/gh/techsoft3d/hoops-web-viewer@2022.2",
+      rendererType: Communicator.RendererType.Client
+    });
+
+    
           hwv = viewer;
 
           window.onresize = function (event) {
@@ -113,8 +126,7 @@
           errorDialog.setText(errorReason);
           errorDialog.show();
         }
-      );
-    };
+      
   </script>
 </head>
 
@@ -858,6 +870,9 @@
       <span style="left: 20px;position: relative;top: -20px;">Model Path for zip upload:  <input type="text" id="modelpath" name="ModelPath" style="width:400px"></span>
             <input type="button" id="exituploadbutton" onclick="csManagerClient.hideUploadWindow()" value="Exit"
         style="position:absolute;right:20px;bottom:20px">
+        <input type="button" id="exituploadbutton" onclick="csManagerClient.createEmpty()" value="Create Empty"
+        style="position:absolute;right:390px;bottom:20px">
+        <span style="position:absolute;right:80px;bottom:20px"><input id = "itemidspan" type="text" id="modelpath" name="ModelPath" style="width:300px"></span>
     </div>
   </div>
 </body>
