@@ -1,5 +1,5 @@
-//const serveraddress = "https://csapi.techsoft3d.com";
-const serveraddress = "http://localhost:3001";
+const serveraddress = "https://csapi.techsoft3d.com";
+//const serveraddress = "http://localhost:3001";
 var globalSessionId;
 
 class CsManagerClient {
