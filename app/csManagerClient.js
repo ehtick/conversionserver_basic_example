@@ -62,6 +62,23 @@ class CsManagerClient {
         }
     }
 
+
+    async _fetchImage(id) {
+
+        let image = await fetch(serveraddress + '/api/file/' + id + "/" + "png");
+        if (image && image.status == 200) {
+            let imageblob = await image.blob();
+            let urlCreator = window.URL || window.webkitURL;
+            let part = urlCreator.createObjectURL(imageblob);
+            let img = $("#" + id).children('img');
+            $(img).attr("src", part);
+            this._modelHash[id].image = part;
+
+        }
+    }
+
+
+
     async _updateModelList(data) {
       
         for (var i = 0; i < data.length; i++) {
@@ -69,19 +86,21 @@ class CsManagerClient {
             var file = data[i].name.split(".")[0];
             if (data[i].conversionState == "SUCCESS" ) {
 
-                let image = await fetch(serveraddress + '/api/file/' + data[i].storageID + "/" + "png");
+                // let image = await fetch(serveraddress + '/api/file/' + data[i].storageID + "/" + "png");
 
-                if (image && image.status == 200) {
-                    let imageblob = await image.blob();
-                    let urlCreator = window.URL || window.webkitURL;
-                    part = urlCreator.createObjectURL(imageblob);
-                }
-                else {
-                    part = "app/images/spinner.gif";
-                }                
+                // if (image && image.status == 200) {
+                //     let imageblob = await image.blob();
+                //     let urlCreator = window.URL || window.webkitURL;
+                //     part = urlCreator.createObjectURL(imageblob);
+                // }
+                // else {
+                //     part = "app/images/spinner.gif";
+                // }                
+                part = "pending";
             }
-            else
+            else {
                 part = "app/images/spinner.gif";
+            }
 
             if (part) {
                 if (!this._modelHash[data[i].storageID]) {
@@ -91,6 +110,14 @@ class CsManagerClient {
             }
         }
         this._drawModelList("sidebar_modellist");
+
+        for (let i in this._modelHash) {
+
+            let img = $("#" + i).children('img');
+            if (img.attr("src") == "pending") {
+                this._fetchImage(i);               
+            }
+        }
     }
 
     async _drawModelList(targetdiv) {

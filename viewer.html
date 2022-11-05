@@ -83,6 +83,7 @@
     window.onload = async function () {
 
 
+//     let res = await fetch(serveraddress + '/api/streamingSession',{ headers: { 'CS-API-Arg': JSON.stringify({streamingLocation:"D:/boeing-full" })} });
      let res = await fetch(serveraddress + '/api/streamingSession');
      var data = await res.json();
      globalSessionId = data.sessionid;
