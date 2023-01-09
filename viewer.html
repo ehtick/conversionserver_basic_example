@@ -90,7 +90,7 @@
 
      let viewer = new Communicator.WebViewer({
       containerId: "viewerContainer",
-      endpointUri: 'wss://' + data.serverurl + ":" + data.port + '?token=' + data.sessionid,
+      endpointUri: 'ws://' + data.serverurl + ":" + data.port + '?token=' + data.sessionid,
       model: "_empty",
       enginePath: "https://cdn.jsdelivr.net/gh/techsoft3d/hoops-web-viewer@2022.2",
       rendererType: Communicator.RendererType.Client

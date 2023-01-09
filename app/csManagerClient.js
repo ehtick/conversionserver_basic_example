@@ -1,6 +1,43 @@
-const serveraddress = "https://csapi.techsoft3d.com";
-//const serveraddress = "http://localhost:3001";
+//const serveraddress = "https://csapi.techsoft3d.com";
+const serveraddress = "http://localhost:3001";
 var globalSessionId;
+
+
+let alreadyLoadedHash = [];
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function requestFromStorage(filename) {
+    if (!alreadyLoadedHash[filename]) {
+        alreadyLoadedHash[filename] = 1;
+        await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'itemnames': JSON.stringify([filename]) } });
+        alreadyLoadedHash[filename] = 2;
+    }
+    else if (alreadyLoadedHash[filename] == 1) {
+        while (1) {
+            await sleep(200);
+            if (alreadyLoadedHash[filename] == 2) {
+                break;
+            }
+        }
+
+    }
+    return filename;
+}
+
+
+
+function shatteredTest() {
+    let cam = Communicator.Camera.fromJson(JSON.parse('{"position":{"x":-3192.6443874544702,"y":4506.593459682243,"z":5004.275601731496},"target":{"x":-4648.431419101627,"y":1281.5401608779775,"z":744.6905645334409},"up":{"x":0.0891450203115475,"y":0.7791911191322622,"z":-0.6204146719888777},"width":5721.455102484024,"height":5721.455102484024,"projection":0,"nearLimit":0.01,"className":"Communicator.Camera"}'));
+    hwv.view.setCamera(cam);
+
+    hwv.model.loadSubtreeFromXmlFile(hwv.model.getRootNode(),"moto.xml", requestFromStorage);
+    cam = Communicator.Camera.fromJson(JSON.parse('{"position":{"x":-3192.6443874544702,"y":4506.593459682243,"z":5004.275601731496},"target":{"x":-4648.431419101627,"y":1281.5401608779775,"z":744.6905645334409},"up":{"x":0.0891450203115475,"y":0.7791911191322622,"z":-0.6204146719888777},"width":5721.455102484024,"height":5721.455102484024,"projection":0,"nearLimit":0.01,"className":"Communicator.Camera"}'));
+    hwv.view.setCamera(cam);
+}
+
 
 class CsManagerClient {
 
