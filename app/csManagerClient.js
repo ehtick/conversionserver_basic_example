@@ -1,6 +1,6 @@
 //const serveraddress = "https://csapi.techsoft3d.com";
 const serveraddress = "http://localhost:3001";
-var globalSessionId;
+var globalSessionId = null;
 
 
 let alreadyLoadedHash = [];
@@ -12,6 +12,7 @@ function sleep(ms) {
 async function requestFromStorage(filename) {
     if (!alreadyLoadedHash[filename]) {
         alreadyLoadedHash[filename] = 1;
+        await sleep(20000);
         await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'itemnames': JSON.stringify([filename]) } });
         alreadyLoadedHash[filename] = 2;
     }
@@ -30,12 +31,7 @@ async function requestFromStorage(filename) {
 
 
 function shatteredTest() {
-    let cam = Communicator.Camera.fromJson(JSON.parse('{"position":{"x":-3192.6443874544702,"y":4506.593459682243,"z":5004.275601731496},"target":{"x":-4648.431419101627,"y":1281.5401608779775,"z":744.6905645334409},"up":{"x":0.0891450203115475,"y":0.7791911191322622,"z":-0.6204146719888777},"width":5721.455102484024,"height":5721.455102484024,"projection":0,"nearLimit":0.01,"className":"Communicator.Camera"}'));
-    hwv.view.setCamera(cam);
-
     hwv.model.loadSubtreeFromXmlFile(hwv.model.getRootNode(),"moto.xml", requestFromStorage);
-    cam = Communicator.Camera.fromJson(JSON.parse('{"position":{"x":-3192.6443874544702,"y":4506.593459682243,"z":5004.275601731496},"target":{"x":-4648.431419101627,"y":1281.5401608779775,"z":744.6905645334409},"up":{"x":0.0891450203115475,"y":0.7791911191322622,"z":-0.6204146719888777},"width":5721.455102484024,"height":5721.455102484024,"projection":0,"nearLimit":0.01,"className":"Communicator.Camera"}'));
-    hwv.view.setCamera(cam);
 }
 
 
@@ -235,14 +231,22 @@ class CsManagerClient {
         if (o.checked) {
             if (this._modelHash[modelid].nodeid == null) {
 
+                if (globalSessionId) {
 
-                // await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'CS-API-Arg': JSON.stringify({subDirectory:"moto_parts" }), 'items': JSON.stringify(["dd727009-1ce4-4713-b652-30be1cae0d3d"]) } });
-                // await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify(["7c9ccdcd-9fc0-4b74-8b39-d96c42202d3e"]) } });
-                await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify([modelid]) } });
+                    await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify([modelid]) } });
               
-                var modelnode = hwv.model.createNode(modelid);
-                var nodeids = await hwv.model.loadSubtreeFromModel(modelnode, this._modelHash[modelid].name);
-                this._modelHash[modelid].nodeid = modelnode;
+                    let modelnode = hwv.model.createNode(modelid);
+                    await hwv.model.loadSubtreeFromModel(modelnode, this._modelHash[modelid].name);                
+                    this._modelHash[modelid].nodeid = modelnode;
+                }
+                else {
+                    let res = await fetch(serveraddress + '/api/file/' +modelid + "/" + "scs");
+                    var ab = await res.arrayBuffer();
+                    var byteArray = new Uint8Array(ab);
+                    var modelnode = hwv.model.createNode(modelid);
+                    var nodeids = await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
+                    this._modelHash[modelid].nodeid = modelnode;
+                }
             }
 
         }
