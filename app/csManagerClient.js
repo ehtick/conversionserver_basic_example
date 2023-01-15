@@ -153,6 +153,10 @@ class CsManagerClient {
         }
     }
 
+    updateAggregate() {
+        
+    }
+
     async _drawModelList(targetdiv) {
 
         $("[id^=modelmenubutton]").each(function (index) {
@@ -161,8 +165,13 @@ class CsManagerClient {
 
         var html = "";
         $("#" + targetdiv).empty();
+        html += '<div style="position:relative;height:35px;background:white">'
+        html += '<label style="left:20px;top:15px" class="switch">';
+        html += '<input id="aggregatetoggle" type="checkbox" onclick="csManagerClient.updateAggregate()"><span class="slider round"></span></label><label style="position:absolute;left:50px;top:5px;">Aggregate models</label>';
+       
         html += '<button onclick=\'csManagerClient.showUploadWindow()\' class="userbutton usereditbutton"><i class="bx bx-upload"></i></button>';
-        html += '<div style="top:40px;position:relative;">';
+        html += '</div>'
+        html += '<div style="position:relative;overflow-y:auto;height:calc(100% - 35px)">';
 
         for (var i in this._modelHash) {
 
@@ -228,29 +237,37 @@ class CsManagerClient {
     }
 
     async addModel(o, modelid) {
+
+        let aggreggate =  $('#aggregatetoggle').prop('checked');
         if (o.checked) {
-            if (this._modelHash[modelid].nodeid == null) {
-
+            if (this._modelHash[modelid].nodeid == null || true) {
+                if (!aggreggate) {
+                    $(':checkbox:checked').prop('checked', false);
+                    $(o).prop('checked', true);                                                
+                    hwv.model.clear();
+                    for (let i in this._modelHash) {
+                        this._modelHash[modelid].nodeid = null;
+                    }
+                }
+                let modelnode = hwv.model.createNode(modelid);
                 if (globalSessionId) {
-
                     await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify([modelid]) } });
-              
-                    let modelnode = hwv.model.createNode(modelid);
-                    await hwv.model.loadSubtreeFromModel(modelnode, this._modelHash[modelid].name);                
-                    this._modelHash[modelid].nodeid = modelnode;
+                    modelnode = hwv.model.createNode(modelid);
+
+                    await hwv.model.loadSubtreeFromModel(modelnode, this._modelHash[modelid].name);
+
                 }
                 else {
-                    let res = await fetch(serveraddress + '/api/file/' +modelid + "/" + "scs");
+                    let res = await fetch(serveraddress + '/api/file/' + modelid + "/" + "scs");
                     var ab = await res.arrayBuffer();
                     var byteArray = new Uint8Array(ab);
-                    var modelnode = hwv.model.createNode(modelid);
                     var nodeids = await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
-                    this._modelHash[modelid].nodeid = modelnode;
                 }
+                this._modelHash[modelid].nodeid = modelnode;
             }
 
         }
-        else {           
+        else {
             hwv.model.deleteNode(this._modelHash[modelid].nodeid);
             this._modelHash[modelid].nodeid = null;
         }
