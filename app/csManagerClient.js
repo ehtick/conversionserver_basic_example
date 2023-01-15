@@ -240,7 +240,7 @@ class CsManagerClient {
 
         let aggreggate =  $('#aggregatetoggle').prop('checked');
         if (o.checked) {
-            if (this._modelHash[modelid].nodeid == null || true) {
+            if (this._modelHash[modelid].nodeid == null || !aggreggate) {
                 if (!aggreggate) {
                     $(':checkbox:checked').prop('checked', false);
                     $(o).prop('checked', true);                                                
