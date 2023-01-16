@@ -1,43 +1,8 @@
-//const serveraddress = "https://csapi.techsoft3d.com";
 const serveraddress = "http://localhost:3001";
+
 var globalSessionId = null;
 
-
-let alreadyLoadedHash = [];
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function requestFromStorage(filename) {
-    if (!alreadyLoadedHash[filename]) {
-        alreadyLoadedHash[filename] = 1;
-        await sleep(20000);
-        await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'itemnames': JSON.stringify([filename]) } });
-        alreadyLoadedHash[filename] = 2;
-    }
-    else if (alreadyLoadedHash[filename] == 1) {
-        while (1) {
-            await sleep(200);
-            if (alreadyLoadedHash[filename] == 2) {
-                break;
-            }
-        }
-
-    }
-    return filename;
-}
-
-
-
-function shatteredTest() {
-    hwv.model.loadSubtreeFromXmlFile(hwv.model.getRootNode(),"moto.xml", requestFromStorage);
-}
-
-
 class CsManagerClient {
-
-   
 
     constructor() {
         this._updatedTime = undefined;
@@ -95,7 +60,6 @@ class CsManagerClient {
         }
     }
 
-
     async _fetchImage(id) {
 
         let image = await fetch(serveraddress + '/api/file/' + id + "/" + "png");
@@ -110,25 +74,13 @@ class CsManagerClient {
         }
     }
 
-
-
     async _updateModelList(data) {
       
         for (var i = 0; i < data.length; i++) {
             var part;
             var file = data[i].name.split(".")[0];
             if (data[i].conversionState == "SUCCESS" ) {
-
-                // let image = await fetch(serveraddress + '/api/file/' + data[i].storageID + "/" + "png");
-
-                // if (image && image.status == 200) {
-                //     let imageblob = await image.blob();
-                //     let urlCreator = window.URL || window.webkitURL;
-                //     part = urlCreator.createObjectURL(imageblob);
-                // }
-                // else {
-                //     part = "app/images/spinner.gif";
-                // }                
+          
                 part = "pending";
             }
             else {
@@ -153,10 +105,6 @@ class CsManagerClient {
         }
     }
 
-    updateAggregate() {
-        
-    }
-
     async _drawModelList(targetdiv) {
 
         $("[id^=modelmenubutton]").each(function (index) {
@@ -167,7 +115,7 @@ class CsManagerClient {
         $("#" + targetdiv).empty();
         html += '<div style="position:relative;height:35px;background:white">'
         html += '<label style="left:20px;top:15px" class="switch">';
-        html += '<input id="aggregatetoggle" type="checkbox" onclick="csManagerClient.updateAggregate()"><span class="slider round"></span></label><label style="position:absolute;left:50px;top:5px;">Aggregate models</label>';
+        html += '<input id="aggregatetoggle" type="checkbox"><span class="slider round"></span></label><label style="position:absolute;left:50px;top:5px;">Aggregate models</label>';
        
         html += '<button onclick=\'csManagerClient.showUploadWindow()\' class="userbutton usereditbutton"><i class="bx bx-upload"></i></button>';
         html += '</div>'
@@ -259,9 +207,9 @@ class CsManagerClient {
                 }
                 else {
                     let res = await fetch(serveraddress + '/api/file/' + modelid + "/" + "scs");
-                    var ab = await res.arrayBuffer();
-                    var byteArray = new Uint8Array(ab);
-                    var nodeids = await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
+                    let ab = await res.arrayBuffer();
+                    let byteArray = new Uint8Array(ab);
+                    await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
                 }
                 this._modelHash[modelid].nodeid = modelnode;
             }
@@ -273,14 +221,6 @@ class CsManagerClient {
         }
     }
 
-    async _loadNewModel(modelid) {
-        await hwv.model.clear();
-        var res = await fetch(serveraddress + '/api/file/' +modelid + "/" + "scs");
-        var ab = await res.arrayBuffer();
-        var byteArray = new Uint8Array(ab);
-        hwv.model.loadSubtreeFromScsBuffer(hwv.model.getRootNode(), byteArray);
-    }
-
     async createEmpty() {
 
         let res = await fetch(serveraddress + '/api/create', { method: 'put',headers: { 'CS-API-Arg': JSON.stringify({itemname:"EmptyContainer" }) } });
@@ -288,5 +228,4 @@ class CsManagerClient {
         $("#itemidspan").val(resj.itemid);
         
     }
-
 }

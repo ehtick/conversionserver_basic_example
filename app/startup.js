@@ -2,7 +2,6 @@ var csManagerClient = null;
 
 function msready() {
 
-  // $("#content").css("top", "0px");
   setTimeout(function () {
 
     var newheight = $("#content").height() - 40;
