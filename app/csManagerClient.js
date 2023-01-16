@@ -244,7 +244,7 @@ class CsManagerClient {
                 if (!aggreggate) {
                     $(':checkbox:checked').prop('checked', false);
                     $(o).prop('checked', true);                                                
-                    hwv.model.clear();
+                    await hwv.model.clear();
                     for (let i in this._modelHash) {
                         this._modelHash[modelid].nodeid = null;
                     }
