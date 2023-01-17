@@ -71,7 +71,12 @@
     var md = new MobileDetect(window.navigator.userAgent);
 
     window.onload = async function () {
-      let res = await fetch(serveraddress + '/api/streamingSession');
+
+      let res = await fetch(serveraddress + '/api/version');
+
+      console.log("Connected to CAAS.\nVersion:" + (await res.text()));
+
+      res = await fetch(serveraddress + '/api/streamingSession');
       var data = await res.json();
       let viewer;
       if (data.ERROR) {
