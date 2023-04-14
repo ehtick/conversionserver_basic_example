@@ -118,7 +118,7 @@ class CsManagerClient {
         html += '<input id="aggregatetoggle" type="checkbox"><span class="slider round"></span></label><label style="position:absolute;left:50px;top:5px;">Aggregate models</label>';
        
         html += '<button onclick=\'csManagerClient.showUploadWindow()\' class="userbutton usereditbutton"><i class="bx bx-upload"></i></button>';
-        html += '</div>'
+        html += '</div>';
         html += '<div style="position:relative;overflow-y:auto;height:calc(100% - 35px)">';
 
         for (var i in this._modelHash) {

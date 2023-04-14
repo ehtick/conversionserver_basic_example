@@ -76,8 +76,8 @@
 
       console.log("Connected to CAAS.\nVersion:" + (await res.text()));
 
-      res = await fetch(serveraddress + '/api/streamingSession');
-      var data = await res.json();
+      res = await fetch(serveraddress + '/api/streamingSession',{headers: { 'CS-API-Arg': JSON.stringify({renderType:"client"}) }} );
+      let data = await res.json();
       let viewer;
       if (data.ERROR) {
         viewer = new Communicator.WebViewer({
