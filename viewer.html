@@ -72,11 +72,11 @@
 
     window.onload = async function () {
 
-      let res = await fetch(serveraddress + '/api/version');
+      let res = await fetch(serveraddress + '/caas_api/info');
 
       console.log("Connected to CAAS.\nVersion:" + (await res.text()));
 
-      res = await fetch(serveraddress + '/api/streamingSession',{headers: { 'CS-API-Arg': JSON.stringify({renderType:"client"}) }} );
+      res = await fetch(serveraddress + '/caas_api/streamingSession',{headers: { 'CS-API-Arg': JSON.stringify({renderType:"client"}) }} );
       let data = await res.json();
       let viewer;
       if (data.ERROR) {

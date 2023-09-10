@@ -13,7 +13,7 @@ class CsManagerClient {
     initialize() {
         let myDropzone;
 
-        myDropzone = new Dropzone("div#dropzonearea", { url: serveraddress + "/api/upload", timeout: 180000 });
+        myDropzone = new Dropzone("div#dropzonearea", { url: serveraddress + "/caas_api/upload", timeout: 180000 });
         myDropzone.on("success", async function (file, response) {
             myDropzone.removeFile(file);
         });
@@ -47,13 +47,13 @@ class CsManagerClient {
     async checkForNewModels() {
         var _this = this;
 
-        let res = await fetch(serveraddress + '/api/updated');
+        let res = await fetch(serveraddress + '/caas_api/updated');
         var data = await res.json();
 
         var newtime = Date.parse(data.lastUpdated);
         if (this._updatedTime == undefined || this._updatedTime != newtime)
         {
-            let res = await fetch(serveraddress + '/api/items');
+            let res = await fetch(serveraddress + '/caas_api/items');
             let data = await res.json();
             this._updatedTime = newtime;
             await this._updateModelList(data.itemarray);
@@ -62,7 +62,7 @@ class CsManagerClient {
 
     async _fetchImage(id) {
 
-        let image = await fetch(serveraddress + '/api/file/' + id + "/" + "png");
+        let image = await fetch(serveraddress + '/caas_api/file/' + id + "/" + "png");
         if (image && image.status == 200) {
             let imageblob = await image.blob();
             let urlCreator = window.URL || window.webkitURL;
@@ -167,7 +167,7 @@ class CsManagerClient {
                         csManagerClient._modelHash[modelid].tree.remove();
                     }
                     delete csManagerClient._modelHash[modelid];
-                    await fetch(serveraddress + '/api/delete/' + modelid, { method: 'PUT'});
+                    await fetch(serveraddress + '/caas_api/delete/' + modelid, { method: 'PUT'});
 
                 }
             }
@@ -199,14 +199,14 @@ class CsManagerClient {
                 }
                 let modelnode = hwv.model.createNode(modelid);
                 if (globalSessionId) {
-                    await fetch(serveraddress + '/api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify([modelid]) } });
+                    await fetch(serveraddress + '/caas_api/enableStreamAccess/' + globalSessionId, { method: 'put', headers: { 'items': JSON.stringify([modelid]) } });
                     modelnode = hwv.model.createNode(modelid);
 
                     await hwv.model.loadSubtreeFromModel(modelnode, this._modelHash[modelid].name);
 
                 }
                 else {
-                    let res = await fetch(serveraddress + '/api/file/' + modelid + "/" + "scs");
+                    let res = await fetch(serveraddress + '/caas_api/file/' + modelid + "/" + "scs");
                     let ab = await res.arrayBuffer();
                     let byteArray = new Uint8Array(ab);
                     await hwv.model.loadSubtreeFromScsBuffer(modelnode, byteArray);
@@ -223,7 +223,7 @@ class CsManagerClient {
 
     async createEmpty() {
 
-        let res = await fetch(serveraddress + '/api/create', { method: 'put',headers: { 'CS-API-Arg': JSON.stringify({itemname:"EmptyContainer" }) } });
+        let res = await fetch(serveraddress + '/caas_api/create', { method: 'put',headers: { 'CS-API-Arg': JSON.stringify({itemname:"EmptyContainer" }) } });
         let resj = await res.json();
         $("#itemidspan").val(resj.itemid);
         
